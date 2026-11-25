@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+LISANS_ONERISI.md
+harita*.json
+rapor*.json
+.turkce_maske/
