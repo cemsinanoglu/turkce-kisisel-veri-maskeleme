@@ -85,7 +85,7 @@ turkce-maske-pano --sifirla   # haritayı boşalt (yeni konuşma)
 | Veri | Nasıl bulunur | Etiket |
 |---|---|---|
 | TC kimlik no | 11 hane ve resmî sağlama algoritması | `[TCKN-1]` |
-| Vergi kimlik no | 10 hane, sağlama ve yakında "vergi/VKN" kelimesi | `[VKN-1]` |
+| Vergi kimlik no | 10 hane, sağlama ve yakında "vergi/VKN" kelimesi (CSV'de sütun başlığı da sayılır) | `[VKN-1]` |
 | IBAN | TR ve yabancı IBAN; boşluklu ya da bitişik; mod-97 sağlaması | `[IBAN-1]` |
 | Telefon | Cep (5xx) ve sabit hat; +90, 0 ve parantezli yazım | `[TEL-1]` |
 | E-posta | Standart biçim; serbest bırakılacak adresler verilebilir | `[EPOSTA-1]` |
@@ -142,7 +142,7 @@ metin2, harita, _ = maskele("Yiğit Karaca dava açtı.", harita={"Yiğit Karaca
 
 ### CSV ve Excel
 - `--sutun "Ad Soyad,Telefon"`: yalnız bu sütunlar işlenir. Ad sütununda (Ad, Soyad, İsim, Unvan…) rakam içermeyen hücre tek kişi olarak maskelenir; "Soyad, Ad" sırası ve `'`, `-`, `.` taşıyan adlar da dahil. Rakam içeren hücre kurallarla işlenir. Diğer sütunlarda kural bir şey bulamazsa hücrenin **tamamı** tutarlı etiket alır (`[DEĞER-n]`).
-- `--sutun` verilmezse tüm hücreler kurallarla taranır.
+- `--sutun` verilmezse tüm hücreler kurallarla taranır. Başlığında "vergi" ya da "VKN" geçen sütunda sağlaması geçerli 10 haneli numara, hücrede bu kelime olmasa da `[VKN-n]` olur.
 - İlk satır başlıktır ve değişmez. Ayraç kendiliğinden bulunur (`;` `,` sekme `|`). Kodlama: UTF-8 (BOM'lu/BOM'suz), olmazsa cp1254.
 - **Excel (.xlsx)** yalnız okunur, çıktı CSV'dir. Standart kütüphaneyle yalnız ilk sayfanın hücre değerleri alınır. Biçim, formül ve birleştirilmiş hücre taşınmaz; tarihler Excel seri sayısı olarak gelir; baştaki sıfırlar Excel'de zaten silinmiş olabilir. Karmaşık dosyalarda Excel'den **"CSV UTF-8"** olarak kaydedip onu verin.
 

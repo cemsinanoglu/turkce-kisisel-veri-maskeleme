@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "turkce-kisisel-veri-maskeleme"
-version = "0.1.0"
+version = "0.1.1"
 description = "Offline Turkish PII masking (TCKN, VKN, IBAN, phone, address, names) that keeps suffixes and restores AI answers."
 readme = "README.md"
 license = {text = "MIT"}

@@ -1,5 +1,8 @@
 # Sürüm notları
 
+## 0.1.1 — 2026-11-25
+- CSV/Excel: başlığında "vergi" ya da "VKN" geçen sütundaki sağlamalı 10 haneli numara artık `--sutun` verilmeden de `[VKN-n]` olur (önceden hücrede bağlam kelimesi yoksa açık kalıyordu). `--sutun` ile seçilen VKN sütunu da `[DEĞER-n]` yerine `[VKN-n]` alır.
+
 ## 0.1.0 — 2026-11-25
 İlk herkese açık sürüm.
 - TCKN, VKN, IBAN (sağlamalı), telefon, e-posta, plaka, doğum tarihi, adres, isteğe bağlı dosya no ve kişi adı maskeleme.

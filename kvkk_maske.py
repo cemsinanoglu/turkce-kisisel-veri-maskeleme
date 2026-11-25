@@ -30,7 +30,7 @@ import re
 import sys
 import zipfile
 
-SURUM = "0.1.0"
+SURUM = "0.1.1"
 
 # ───────────────────────── Türkçe harf dönüşümü ─────────────────────────
 # Python'un str.upper/str.lower Türkçe i/ı ayrımını bilmez: "Yiğit".upper() -> "YIĞIT" (yanlış),
@@ -1043,6 +1043,8 @@ def csv_maskele(metin, sutunlar=None, harita=None, kurallar=VARSAYILAN_KURALLAR,
     else:
         secili = list(range(len(baslik)))
     ad_sutunu = {i: bool(set(re.split(r"[^\wçğıöşüÇĞİÖŞÜ]+", tr_lower(baslik[i]))) & _AD_SUTUNU) for i in secili}
+    # sütun başlığı "vergi/VKN" ise başlık o sütundaki her hücrenin bağlamıdır (hücrede kelime olmasa da)
+    vkn_sutunu = {i: "vkn" in kurallar and bool(_VKN_BAGLAM.search(baslik[i])) for i in secili}
     for satir in satirlar[1:]:
         for i in secili:
             if i >= len(satir) or not satir[i].strip():
@@ -1062,6 +1064,11 @@ def csv_maskele(metin, sutunlar=None, harita=None, kurallar=VARSAYILAN_KURALLAR,
                         H.ver("KİŞİ", deger, H.bul("KİŞİ", ad))     # hücrenin yazıldığı biçim de aynı kişi
                     H.yay()
             yeni, _ = _maskele_ic(hucre, H, kurallar, haric=haric, ozel=ozel)
+            if yeni == hucre and vkn_sutunu[i] and not serbest:
+                for m in _VKN.finditer(hucre):
+                    if vkn_gecerli(m.group(0)):
+                        v = m.group(0)
+                        yeni = yeni.replace(v, "[%s]" % (H.bul("VKN", v) or H.ver("VKN", v)))
             if yeni == hucre and sutunlar and not serbest:
                 etiket = H.bul("DEĞER", deger) or H.ver("DEĞER", deger)
                 yeni = hucre.replace(deger, "[%s]" % etiket)
@@ -1602,6 +1609,20 @@ def _oz_sinama():
     c3, _, ay3 = csv_maskele('Müşteri,Şehir\n"Bilgin, Ayşe",Kadıköy\n', ["Şehir"])
     ozel("CSV: virgül ayraç + tırnaklı hücre + DEĞER etiketi", ay3 == "," and "[DEĞER-1]" in c3 and '"Bilgin, Ayşe"' in c3)
     ozel("CSV: geri dönüş", geri_al(c1, ch) == csv1)
+    # sütun başlığı "Vergi No/VKN" bağlam sayılır (25.11.2026: --sutun verilmeden VKN açık kalıyordu)
+    vx = vkn_uret(rng)
+    vy = next(vx[:9] + str(d) for d in range(10) if not vkn_gecerli(vx[:9] + str(d)))
+    csv_v = "Unvan;Vergi No;Adet\nÖrnek Ltd;%s;3\nDeneme AŞ;%s;1\nÖrnek Ltd;%s;2\n" % (vx, vy, vx)
+    cv, hv, _ = csv_maskele(csv_v)
+    sv = [r.split(";") for r in cv.splitlines()]
+    ozel("CSV: 'Vergi No' başlığı bağlamdır, --sutun olmadan [VKN-n]", sv[1][1] == "[VKN-1]")
+    ozel("CSV: aynı VKN her satırda aynı etiketi alır", sv[3][1] == "[VKN-1]")
+    ozel("CSV: sağlaması tutmayan numara VKN sütununda da açık kalır", sv[2][1] == vy)
+    ozel("CSV: VKN sütunu geri dönüş", geri_al(cv, hv) == csv_v)
+    cv2, _, _ = csv_maskele(csv_v, kurallar=VARSAYILAN_KURALLAR - {"vkn"})
+    ozel("CSV: vkn kuralı kapalıysa başlık da maskeletmez", vx in cv2)
+    cv3, _, _ = csv_maskele("Unvan;VKN\nÖrnek Ltd;%s\n" % vx, ["VKN"])
+    ozel("CSV: --sutun ile VKN sütunu [VKN-n] olur ([DEĞER-n] değil)", cv3.splitlines()[1].endswith(";[VKN-1]"))
     try:
         csv_maskele(csv1, ["Yok Sütun"]); hata_var = False
     except ValueError:

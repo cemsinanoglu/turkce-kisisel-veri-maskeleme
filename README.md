@@ -85,7 +85,7 @@ turkce-maske-pano --sifirla   # empty the map (new conversation)
 | Data | How it is detected | Label |
 |---|---|---|
 | Turkish ID number (TCKN) | 11 digits and the official checksum | `[TCKN-1]` |
-| Tax number (VKN) | 10 digits, checksum and a nearby "vergi/VKN" word | `[VKN-1]` |
+| Tax number (VKN) | 10 digits, checksum and a nearby "vergi/VKN" word (in CSV, the column header counts too) | `[VKN-1]` |
 | IBAN | TR and foreign IBANs, spaced or not, mod-97 checksum | `[IBAN-1]` |
 | Phone | Mobile (5xx) and landline, with +90, 0 or parentheses | `[TEL-1]` |
 | E-mail | Standard format; addresses can be allow-listed | `[EPOSTA-1]` |
@@ -142,7 +142,7 @@ text2, mapping, _ = maskele("Yiğit Karaca dava açtı.", harita={"Yiğit Karaca
 
 ### CSV and Excel
 - `--sutun "Ad Soyad,Telefon"`: only these columns are processed. In a name column (Ad, Soyad, İsim, Unvan…) a cell without digits is masked as one person, including the "Surname, Name" order and names with `'`, `-` or `.`. A cell that contains digits is processed by the rules. In other columns, if no rule matches, the **whole cell** gets a consistent label (`[DEĞER-n]`).
-- Without `--sutun`, every cell is scanned with the rules.
+- Without `--sutun`, every cell is scanned with the rules. In a column whose header contains "vergi" or "VKN", a 10-digit number with a valid checksum becomes `[VKN-n]` even if the cell itself has no such word.
 - The first row is the header and is kept. The delimiter is detected (`;` `,` tab `|`). Encoding: UTF-8 (with or without BOM), then cp1254.
 - **Excel (.xlsx)** is read-only and the output is CSV. Only the cell values of the first sheet are read with the standard library. Formatting, formulas and merged cells are lost; dates arrive as Excel serial numbers; leading zeros may already be gone in Excel. For complex files, save as **"CSV UTF-8"** in Excel and use that.
 

@@ -17,7 +17,7 @@ No Git or no install rights: download the repository and run `python3 kvkk_maske
 ## Verify
 
 ```bash
-python3 kvkk_maske.py --test      # must print "193/193" (or N/N); exit code 0
+python3 kvkk_maske.py --test      # must print "N/N geçti" (all passed); exit code 0
 python3 pano_maskele.py --test    # clipboard helper self-test
 ```
 
